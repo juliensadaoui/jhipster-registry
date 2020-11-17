@@ -25,25 +25,11 @@ spring:
     allow-bean-definition-overriding: true
   messages:
     basename: i18n/messages
-  mvc:
-    favicon:
-      enabled: false
   security:
     user:
       name: admin
       password: admin
       roles: USER,ADMIN
-  task:
-    execution:
-      thread-name-prefix: j-hipster-registry-task-
-      pool:
-        core-size: 1
-        max-size: 50
-        queue-capacity: 10000
-    scheduling:
-      thread-name-prefix: j-hipster-registry-scheduling-
-      pool:
-        size: 1
   thymeleaf:
     mode: HTML
 
@@ -86,11 +72,6 @@ jhipster:
         base64-secret: OTc1OGNjNmNiMTQ5NWIyNjdjYjAwNmUyYWFjNzQ1Njk2NDBkZGMyMzRmMzZiM2I3ZTllOGM4ZmE5NDA2MzA5ODdlODM5OGYxNzU4OGExNmM2N2Y5YzU0OWVjNWQ4NTA1OWQyMA==
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
-  metrics:
-    logs: # Reports metrics in the logs
-      enabled: true
-      report-frequency: 60 # in seconds
-
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

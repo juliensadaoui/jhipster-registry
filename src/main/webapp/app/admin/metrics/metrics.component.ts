@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Metrics, MetricsKey, MetricsService, Thread, ThreadDump } from './metrics.service';
 import { Route } from 'app/shared/routes/route.model';
 import { RoutesService } from 'app/shared/routes/routes.service';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { Metrics, Thread, ThreadDump } from './metrics.model';
+import { MetricsService } from './metrics.service';
 
 @Component({
   selector: 'jhi-metrics',
@@ -62,12 +63,12 @@ export class MetricsComponent implements OnInit, OnDestroy {
     }
   }
 
-  metricsKeyExists(key: MetricsKey): boolean {
-    return this.metrics && this.metrics[key];
+  metricsKeyExists(key: keyof Metrics): boolean {
+    return Boolean(this.metrics?.[key]);
   }
 
-  metricsKeyExistsAndObjectNotEmpty(key: MetricsKey): boolean {
-    return this.metrics && this.metrics[key] && JSON.stringify(this.metrics[key]) !== '{}';
+  metricsKeyExistsAndObjectNotEmpty(key: keyof Metrics): boolean {
+    return Boolean(this.metrics?.[key] && JSON.stringify(this.metrics[key]) !== '{}');
   }
 
   ngOnDestroy(): void {

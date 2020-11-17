@@ -1,24 +1,24 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
-import { JhiEventManager } from 'ng-jhipster';
+import { takeUntil } from 'rxjs/operators';
 
-import { Health, HealthService, HealthStatus } from 'app/admin/health/health.service';
-
+import { HealthService } from 'app/admin/health/health.service';
+import { Health, HealthStatus } from 'app/admin/health/health.model';
 import { VERSION } from 'app/app.constants';
-import { EurekaStatusKey, EurekaStatusService } from './eureka.status.service';
-import { ProfileService } from 'app/layouts/profiles/profile.service';
-import { LoginOAuth2Service } from 'app/shared/oauth2/login-oauth2.service';
-import { LoginModalService } from 'app/core/login/login-modal.service';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/user/account.model';
+import { EventManager } from 'app/core/event-manager/event-manager.service';
+import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { ApplicationsService, Instance } from 'app/registry/applications/applications.service';
+import { LoginOAuth2Service } from 'app/shared/oauth2/login-oauth2.service';
 import { RefreshService } from 'app/shared/refresh/refresh.service';
-import { takeUntil } from 'rxjs/operators';
+import { EurekaStatusKey, EurekaStatusService } from './eureka.status.service';
 
 @Component({
   selector: 'jhi-home',
   templateUrl: './home.component.html',
-  styleUrls: ['home.scss']
+  styleUrls: ['home.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   account?: Account | null;
@@ -34,9 +34,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private accountService: AccountService,
-    private loginModalService: LoginModalService,
+    private router: Router,
     private loginOAuth2Service: LoginOAuth2Service,
-    private eventManager: JhiEventManager,
+    private eventManager: EventManager,
     private eurekaStatusService: EurekaStatusService,
     private applicationsService: ApplicationsService,
     private healthService: HealthService,
@@ -85,7 +85,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (profileInfo.activeProfiles!.includes('oauth2')) {
           this.loginOAuth2Service.login();
         } else {
-          this.loginModalService.open();
+          this.router.navigate(['/login']);
         }
       });
   }

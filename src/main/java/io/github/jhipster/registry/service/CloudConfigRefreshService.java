@@ -1,14 +1,11 @@
 package io.github.jhipster.registry.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.refresh.ContextRefresher;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
+import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
+import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static tech.jhipster.config.JHipsterConstants.SPRING_PROFILE_K8S;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -20,12 +17,14 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
-
-import static com.sun.nio.file.SensitivityWatchEventModifier.HIGH;
-import static io.github.jhipster.config.JHipsterConstants.SPRING_PROFILE_K8S;
-import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.refresh.ContextRefresher;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 /**
  * Kubernetes (K8s) cloud config refresher service
@@ -60,20 +59,23 @@ public class CloudConfigRefreshService {
     @PostConstruct
     public void configMapWatcher() {
         if (getConfigPath() != null && !getConfigPath().isEmpty()) {
-            taskExecutor = Executors.newSingleThreadScheduledExecutor(
-                job -> {
-                    Thread thread = new Thread(job, "CloudConfigMapRefresher");
-                    thread.setDaemon(true);
-                    return thread;
+            taskExecutor =
+                Executors.newSingleThreadScheduledExecutor(
+                    job -> {
+                        Thread thread = new Thread(job, "CloudConfigMapRefresher");
+                        thread.setDaemon(true);
+                        return thread;
+                    }
+                );
+            taskExecutor.execute(
+                () -> {
+                    try {
+                        configMapRefreshContext();
+                    } catch (IOException | InterruptedException ex) {
+                        log.error("Unable to refresh K8s ConfigMap", ex);
+                    }
                 }
             );
-            taskExecutor.execute(() -> {
-                try {
-                    configMapRefreshContext();
-                } catch (IOException | InterruptedException ex) {
-                    log.error("Unable to refresh K8s ConfigMap", ex);
-                }
-            });
         } else {
             log.error("ConfigMap directory path not specified. Specify value for the environment variable k8s.config.path");
         }
@@ -91,29 +93,34 @@ public class CloudConfigRefreshService {
         List<Integer> hashList = new ArrayList();
         WatchService watcherService = FileSystems.getDefault().newWatchService();
         Path dirPath = Paths.get(getConfigPath());
-        Files.walkFileTree(dirPath, new HashSet<FileVisitOption>() {
-            {
-                add(FOLLOW_LINKS);
-            }
-        }, 2, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                log.debug("Registering" + dir + " in watcher service");
-                dir.register(watcherService, new WatchEvent.Kind[]{ENTRY_MODIFY}, HIGH);
-                return CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-                File file = path.toFile();
-                if (isValidConfigFile(file.getName().toLowerCase())) {
-                    log.debug("Adding file: " + file.getAbsolutePath());
-                    fileList.add(file);
-                    hashList.add(getHashValue(file));
+        Files.walkFileTree(
+            dirPath,
+            new HashSet<FileVisitOption>() {
+                {
+                    add(FOLLOW_LINKS);
                 }
-                return CONTINUE;
+            },
+            2,
+            new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    log.debug("Registering" + dir + " in watcher service");
+                    dir.register(watcherService, new WatchEvent.Kind[] { ENTRY_MODIFY }, HIGH);
+                    return CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                    File file = path.toFile();
+                    if (isValidConfigFile(file.getName().toLowerCase())) {
+                        log.debug("Adding file: " + file.getAbsolutePath());
+                        fileList.add(file);
+                        hashList.add(getHashValue(file));
+                    }
+                    return CONTINUE;
+                }
             }
-        });
+        );
         while (true) {
             WatchKey key = watcherService.take();
             List<WatchEvent<?>> events = key.pollEvents();
@@ -157,8 +164,15 @@ public class CloudConfigRefreshService {
      * @return hasCode int
      */
     private int getHashValue(File file) {
-        return (37 * 21 + (file.getAbsolutePath().hashCode() + (int) (file.length() ^ (file.length() >>> 32))
-            + (int) (file.lastModified() ^ (file.lastModified() >>> 32))));
+        return (
+            37 *
+            21 +
+            (
+                file.getAbsolutePath().hashCode() +
+                (int) (file.length() ^ (file.length() >>> 32)) +
+                (int) (file.lastModified() ^ (file.lastModified() >>> 32))
+            )
+        );
     }
 
     /**

@@ -1,37 +1,39 @@
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
-import { JHipsterRegistryTestModule } from '../../../test.module';
 import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
-import { MockAlertService } from '../../../helpers/mock-alert.service';
+import { EventManager } from 'app/core/event-manager/event-manager.service';
+import { Alert, AlertService } from 'app/core/util/alert.service';
 
 describe('Component Tests', () => {
   describe('Alert Error Component', () => {
     let comp: AlertErrorComponent;
     let fixture: ComponentFixture<AlertErrorComponent>;
-    let eventManager: JhiEventManager;
+    let eventManager: EventManager;
+    let alertService: AlertService;
 
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
-        imports: [JHipsterRegistryTestModule],
-        declarations: [AlertErrorComponent],
-        providers: [
-          JhiEventManager,
-          {
-            provide: JhiAlertService,
-            useClass: MockAlertService,
-          },
-        ],
+    beforeEach(
+      waitForAsync(() => {
+        TestBed.configureTestingModule({
+          declarations: [AlertErrorComponent],
+          providers: [EventManager, AlertService],
+        })
+          .overrideTemplate(AlertErrorComponent, '')
+          .compileComponents();
       })
-        .overrideTemplate(AlertErrorComponent, '')
-        .compileComponents();
-    }));
+    );
 
     beforeEach(() => {
       fixture = TestBed.createComponent(AlertErrorComponent);
       comp = fixture.componentInstance;
-      eventManager = fixture.debugElement.injector.get(JhiEventManager);
+      eventManager = TestBed.inject(EventManager);
+      alertService = TestBed.inject(AlertService);
+      alertService.addAlert = (alert: Alert, alerts?: Alert[]) => {
+        if (alerts) {
+          alerts.push(alert);
+        }
+        return alert;
+      };
     });
 
     describe('Error Handling', () => {
@@ -40,7 +42,7 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: { status: 0 } });
         // THEN
         expect(comp.alerts.length).toBe(1);
-        expect(comp.alerts[0].msg).toBe('Server not reachable');
+        expect(comp.alerts[0].message).toBe('Server not reachable');
       });
 
       it('Should display an alert on status 404', () => {
@@ -48,7 +50,7 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: { status: 404 } });
         // THEN
         expect(comp.alerts.length).toBe(1);
-        expect(comp.alerts[0].msg).toBe('Not found');
+        expect(comp.alerts[0].message).toBe('Not found');
       });
 
       it('Should display an alert on generic error', () => {
@@ -57,8 +59,8 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: { error: 'Second Error Message' } });
         // THEN
         expect(comp.alerts.length).toBe(2);
-        expect(comp.alerts[0].msg).toBe('Error Message');
-        expect(comp.alerts[1].msg).toBe('Second Error Message');
+        expect(comp.alerts[0].message).toBe('Error Message');
+        expect(comp.alerts[1].message).toBe('Second Error Message');
       });
 
       it('Should display an alert on status 400 for generic error', () => {
@@ -79,7 +81,7 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: response });
         // THEN
         expect(comp.alerts.length).toBe(1);
-        expect(comp.alerts[0].msg).toBe('error.validation');
+        expect(comp.alerts[0].message).toBe('error.validation');
       });
 
       it('Should display an alert on status 400 for generic error without message', () => {
@@ -93,7 +95,7 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: response });
         // THEN
         expect(comp.alerts.length).toBe(1);
-        expect(comp.alerts[0].msg).toBe('Bad Request');
+        expect(comp.alerts[0].message).toBe('Bad Request');
       });
 
       it('Should display an alert on status 400 for invalid parameters', () => {
@@ -115,7 +117,7 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: response });
         // THEN
         expect(comp.alerts.length).toBe(1);
-        expect(comp.alerts[0].msg).toBe('Error on field "MinField"');
+        expect(comp.alerts[0].message).toBe('Error on field "MinField"');
       });
 
       it('Should display an alert on status 400 for error headers', () => {
@@ -133,7 +135,7 @@ describe('Component Tests', () => {
         eventManager.broadcast({ name: 'jHipsterRegistryApp.httpError', content: response });
         // THEN
         expect(comp.alerts.length).toBe(1);
-        expect(comp.alerts[0].msg).toBe('Error Message');
+        expect(comp.alerts[0].message).toBe('Error Message');
       });
     });
   });

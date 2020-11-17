@@ -82,7 +82,7 @@ export class RefreshSelectorComponent implements OnInit, OnDestroy {
     if (this.activeRefreshTime <= 0) {
       return 'disabled';
     }
-    return this.activeRefreshTime + ' sec.';
+    return `${this.activeRefreshTime} sec.`;
   }
 
   ngOnDestroy(): void {

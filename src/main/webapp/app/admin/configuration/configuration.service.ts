@@ -5,54 +5,14 @@ import { map } from 'rxjs/operators';
 
 import { SERVER_API_URL } from 'app/app.constants';
 import { Route } from 'app/shared/routes/route.model';
-
-export interface ConfigProps {
-  contexts: Contexts;
-}
-
-export interface Contexts {
-  [key: string]: Context;
-}
-
-export interface Context {
-  beans: Beans;
-  parentId?: any;
-}
-
-export interface Beans {
-  [key: string]: Bean;
-}
-
-export interface Bean {
-  prefix: string;
-  properties: any;
-}
-
-export interface Env {
-  activeProfiles?: string[];
-  propertySources: PropertySource[];
-}
-
-export interface PropertySource {
-  name: string;
-  properties: Properties;
-}
-
-export interface Properties {
-  [key: string]: Property;
-}
-
-export interface Property {
-  value: string;
-  origin?: string;
-}
+import { Bean, Beans, ConfigProps, Env, PropertySource } from './configuration.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConfigurationService {
   constructor(private http: HttpClient) {}
 
-  getBeans(prefix: String = ''): Observable<Bean[]> {
-    return this.http.get<ConfigProps>((SERVER_API_URL as string) + prefix + 'management/configprops').pipe(
+  getBeans(prefix: string = ''): Observable<Bean[]> {
+    return this.http.get<ConfigProps>(SERVER_API_URL + prefix + 'management/configprops').pipe(
       map(configProps =>
         Object.values(
           Object.values(configProps.contexts)
@@ -64,23 +24,19 @@ export class ConfigurationService {
   }
 
   getInstanceBeans(instance: Route | undefined): Observable<Bean[]> {
-    if (instance && instance.prefix && instance.prefix.length > 0) {
-      return this.getBeans(instance.prefix + '/');
+    if (instance!.prefix.length > 0) {
+      return this.getBeans(instance!.prefix + '/');
     }
     return this.getBeans();
   }
 
-  getPropertySources(prefix: String = ''): Observable<PropertySource[]> {
-    return this.http.get<Env>((SERVER_API_URL as string) + prefix + 'management/env').pipe(
-      map(env => {
-        return env.propertySources;
-      })
-    );
+  getPropertySources(prefix: string = ''): Observable<PropertySource[]> {
+    return this.http.get<Env>(SERVER_API_URL + prefix + 'management/env').pipe(map(env => env.propertySources));
   }
 
   getInstancePropertySources(instance: Route | undefined): Observable<PropertySource[]> {
-    if (instance && instance.prefix && instance.prefix.length > 0) {
-      return this.getPropertySources(instance.prefix + '/');
+    if (instance!.prefix.length > 0) {
+      return this.getPropertySources(instance!.prefix + '/');
     }
     return this.getPropertySources();
   }

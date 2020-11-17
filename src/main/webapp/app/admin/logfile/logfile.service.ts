@@ -14,8 +14,8 @@ export class LogfileService {
 
   // get the instance's logfile
   getInstanceLogfile(instance: Route | undefined): Observable<string> {
-    if (instance && instance.prefix && instance.prefix.length > 0) {
-      return this.http.get(instance.prefix + '/management/logfile', { responseType: 'text' });
+    if (instance!.prefix.length > 0) {
+      return this.http.get(instance!.prefix + '/management/logfile', { responseType: 'text' });
     }
     return this.getLogfile();
   }

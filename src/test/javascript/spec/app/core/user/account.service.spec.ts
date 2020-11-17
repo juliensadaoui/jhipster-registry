@@ -1,18 +1,18 @@
+jest.mock('@angular/router');
+jest.mock('app/core/auth/state-storage.service');
+
 import { Router } from '@angular/router';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { JhiDateUtils } from 'ng-jhipster';
 import { NgxWebstorageModule } from 'ngx-webstorage';
 
 import { SERVER_API_URL } from 'app/app.constants';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/user/account.model';
-import { Authority } from 'app/shared/constants/authority.constants';
+import { Authority } from 'app/core/user/authority.model';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
-import { MockRouter } from '../../../helpers/mock-route.service';
-import { MockStateStorageService } from '../../../helpers/mock-state-storage.service';
 
-function accountWithAuthorities(authorities: string[]): Account {
+function accountWithAuthorities(authorities: Authority[]): Account {
   return {
     activated: true,
     authorities,
@@ -29,29 +29,19 @@ describe('Service Tests', () => {
   describe('Account Service', () => {
     let service: AccountService;
     let httpMock: HttpTestingController;
-    let storageService: MockStateStorageService;
-    let router: MockRouter;
+    let mockStorageService: StateStorageService;
+    let mockRouter: Router;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule, NgxWebstorageModule.forRoot()],
-        providers: [
-          JhiDateUtils,
-          {
-            provide: StateStorageService,
-            useClass: MockStateStorageService,
-          },
-          {
-            provide: Router,
-            useClass: MockRouter,
-          },
-        ],
+        providers: [StateStorageService, Router],
       });
 
-      service = TestBed.get(AccountService);
-      httpMock = TestBed.get(HttpTestingController);
-      storageService = TestBed.get(StateStorageService);
-      router = TestBed.get(Router);
+      service = TestBed.inject(AccountService);
+      httpMock = TestBed.inject(HttpTestingController);
+      mockStorageService = TestBed.inject(StateStorageService);
+      mockRouter = TestBed.inject(Router);
     });
 
     afterEach(() => {
@@ -119,16 +109,16 @@ describe('Service Tests', () => {
       describe('navigateToStoredUrl', () => {
         it('should navigate to the previous stored url post successful authentication', () => {
           // GIVEN
-          storageService.setResponse('admin/users?page=0');
+          mockStorageService.getUrl = jest.fn(() => 'admin/users?page=0');
 
           // WHEN
           service.identity().subscribe();
           httpMock.expectOne({ method: 'GET' }).flush({});
 
           // THEN
-          expect(storageService.getUrlSpy).toHaveBeenCalledTimes(1);
-          expect(storageService.clearUrlSpy).toHaveBeenCalledTimes(1);
-          expect(router.navigateByUrlSpy).toHaveBeenCalledWith('admin/users?page=0');
+          expect(mockStorageService.getUrl).toHaveBeenCalledTimes(1);
+          expect(mockStorageService.clearUrl).toHaveBeenCalledTimes(1);
+          expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('admin/users?page=0');
         });
 
         it('should not navigate to the previous stored url when authentication fails', () => {
@@ -137,23 +127,23 @@ describe('Service Tests', () => {
           httpMock.expectOne({ method: 'GET' }).error(new ErrorEvent(''));
 
           // THEN
-          expect(storageService.getUrlSpy).not.toHaveBeenCalled();
-          expect(storageService.clearUrlSpy).not.toHaveBeenCalled();
-          expect(router.navigateByUrlSpy).not.toHaveBeenCalled();
+          expect(mockStorageService.getUrl).not.toHaveBeenCalled();
+          expect(mockStorageService.clearUrl).not.toHaveBeenCalled();
+          expect(mockRouter.navigateByUrl).not.toHaveBeenCalled();
         });
 
         it('should not navigate to the previous stored url when no such url exists post successful authentication', () => {
           // GIVEN
-          storageService.setResponse(null);
+          mockStorageService.getUrl = jest.fn(() => null);
 
           // WHEN
           service.identity().subscribe();
           httpMock.expectOne({ method: 'GET' }).flush({});
 
           // THEN
-          expect(storageService.getUrlSpy).toHaveBeenCalledTimes(1);
-          expect(storageService.clearUrlSpy).not.toHaveBeenCalled();
-          expect(router.navigateByUrlSpy).not.toHaveBeenCalled();
+          expect(mockStorageService.getUrl).toHaveBeenCalledTimes(1);
+          expect(mockStorageService.clearUrl).not.toHaveBeenCalled();
+          expect(mockRouter.navigateByUrl).not.toHaveBeenCalled();
         });
       });
     });

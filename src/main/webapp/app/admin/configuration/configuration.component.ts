@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { Bean, ConfigurationService, PropertySource } from './configuration.service';
+import { Bean, PropertySource } from './configuration.model';
+import { ConfigurationService } from './configuration.service';
 import { Route } from 'app/shared/routes/route.model';
 import { RoutesService } from 'app/shared/routes/routes.service';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'jhi-configuration',

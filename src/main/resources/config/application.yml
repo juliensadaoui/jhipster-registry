@@ -14,46 +14,9 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
-spring:
-  application:
-    name: jhipster-registry
-  jmx:
-    enabled: false
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    favicon:
-      enabled: false
-  security:
-    user:
-      name: admin
-      password: admin
-      roles: USER, ADMIN
-  task:
-    execution:
-      thread-name-prefix: jhipster-registry-task-
-      pool:
-        core-size: 2
-        max-size: 50
-        queue-capacity: 10000
-    scheduling:
-      thread-name-prefix: jhipster-registry-scheduling-
-      pool:
-        size: 2
-  thymeleaf:
-    mode: HTML
-  output:
-    ansi:
-      console-available: true
-
-logging:
-  file:
-    name: target/jhipster-registry.log
-
 ribbon:
   eureka:
     enabled: true
-
 # See http://cloud.spring.io/spring-cloud-netflix/spring-cloud-netflix.html
 zuul: # those values must be configured depending on the application specific needs
   sensitive-headers: Cookie,Set-Cookie #see https://github.com/spring-cloud/spring-cloud-netflix/issues/3126
@@ -73,7 +36,7 @@ management:
         include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'threaddump']
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: when_authorized
       roles: 'ROLE_ADMIN'
     jhimetrics:
       enabled: true
@@ -81,6 +44,13 @@ management:
     git:
       mode: full
   health:
+    group:
+      liveness:
+        include: livenessState
+      readiness:
+        include: readinessState
+    probes:
+      enabled: true
     mail:
       enabled: false # When using the MailService, configure an SMTP server and set this to true
   metrics:
@@ -102,6 +72,39 @@ management:
         request:
           autotime:
             enabled: true
+
+spring:
+  application:
+    name: jhipster-registry
+  jmx:
+    enabled: false
+  messages:
+    basename: i18n/messages
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    user:
+      name: admin
+      password: admin
+      roles:
+        - ADMIN
+        - USER
+  task:
+    execution:
+      thread-name-prefix: jhipster-registry-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: jhipster-registry-scheduling-
+      pool:
+        size: 2
+  thymeleaf:
+    mode: HTML
+  output:
+    ansi:
+      console-available: true
 
 server:
   port: 8761
@@ -166,8 +169,7 @@ eureka:
 # Add your own application properties here, see the ApplicationProperties class
 # to have type-safe configuration, like in the JHipsterProperties above
 #
-# More documentation is available at:
-# https://www.jhipster.tech/common-application-properties/
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 jhipster:
   clientApp:
@@ -180,7 +182,7 @@ jhipster:
   #     exposed-headers: "Authorization,Link,X-Total-Count"
   #     allow-credentials: true
   #     max-age: 1800
-  swagger:
+  api-docs:
     default-include-pattern: /api/.*
     title: JHipster Registry API
     description: JHipster Registry API documentation

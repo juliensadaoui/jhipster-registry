@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SERVER_API_URL } from 'app/app.constants';
-import { map } from 'rxjs/operators';
+import { Logout } from 'app/login/logout.model';
 
 @Injectable({ providedIn: 'root' })
 export class LoginOAuth2Service {
@@ -25,12 +25,8 @@ export class LoginOAuth2Service {
     location.href = `//${location.hostname}${port}${contextPath}oauth2/authorization/oidc`;
   }
 
-  logout(): Observable<any> {
+  logout(): Observable<Logout> {
     // logout from the server
-    return this.http.post(SERVER_API_URL + 'api/logout', {}, { observe: 'response' }).pipe(
-      map((response: HttpResponse<any>) => {
-        return response;
-      })
-    );
+    return this.http.post<Logout>(SERVER_API_URL + 'api/logout', {});
   }
 }

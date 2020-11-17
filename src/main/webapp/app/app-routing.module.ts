@@ -3,8 +3,9 @@ import { RouterModule } from '@angular/router';
 import { errorRoute } from './layouts/error/error.route';
 import { navbarRoute } from './layouts/navbar/navbar.route';
 import { DEBUG_INFO_ENABLED } from 'app/app.constants';
+import { Authority } from 'app/core/user/authority.model';
 
-import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 
 const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
 
@@ -15,18 +16,14 @@ const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
         {
           path: 'admin',
           data: {
-            authorities: ['ROLE_ADMIN'],
+            authorities: [Authority.ADMIN],
           },
           canActivate: [UserRouteAccessService],
           loadChildren: () => import('./admin/admin-routing.module').then(m => m.AdminRoutingModule),
         },
         {
-          path: 'registry',
-          data: {
-            authorities: ['ROLE_ADMIN'],
-          },
-          canActivate: [UserRouteAccessService],
-          loadChildren: () => import('./registry/registry-routing.module').then(m => m.RegistryRoutingModule),
+          path: 'login',
+          loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
         },
         ...LAYOUT_ROUTES,
       ],
@@ -35,4 +32,4 @@ const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
   ],
   exports: [RouterModule],
 })
-export class JHipsterRegistryAppRoutingModule {}
+export class AppRoutingModule {}

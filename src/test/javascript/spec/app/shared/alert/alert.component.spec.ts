@@ -1,28 +1,31 @@
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { JhiAlertService } from 'ng-jhipster';
+jest.mock('app/core/util/alert.service');
 
-import { JHipsterRegistryTestModule } from '../../../test.module';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+
+import { AlertService } from 'app/core/util/alert.service';
 import { AlertComponent } from 'app/shared/alert/alert.component';
 
 describe('Component Tests', () => {
   describe('Alert Component', () => {
     let comp: AlertComponent;
     let fixture: ComponentFixture<AlertComponent>;
-    let alertService: JhiAlertService;
+    let mockAlertService: AlertService;
 
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
-        imports: [JHipsterRegistryTestModule],
-        declarations: [AlertComponent],
+    beforeEach(
+      waitForAsync(() => {
+        TestBed.configureTestingModule({
+          declarations: [AlertComponent],
+          providers: [AlertService],
+        })
+          .overrideTemplate(AlertComponent, '')
+          .compileComponents();
       })
-        .overrideTemplate(AlertComponent, '')
-        .compileComponents();
-    }));
+    );
 
     beforeEach(() => {
       fixture = TestBed.createComponent(AlertComponent);
       comp = fixture.componentInstance;
-      alertService = TestBed.get(JhiAlertService);
+      mockAlertService = TestBed.inject(AlertService);
     });
 
     it('Should call alertService.get on init', () => {
@@ -30,7 +33,7 @@ describe('Component Tests', () => {
       comp.ngOnInit();
 
       // THEN
-      expect(alertService.get).toHaveBeenCalled();
+      expect(mockAlertService.get).toHaveBeenCalled();
     });
 
     it('Should call alertService.clear on destroy', () => {
@@ -38,7 +41,7 @@ describe('Component Tests', () => {
       comp.ngOnDestroy();
 
       // THEN
-      expect(alertService.clear).toHaveBeenCalled();
+      expect(mockAlertService.clear).toHaveBeenCalled();
     });
   });
 });

@@ -98,14 +98,11 @@ export class RouteSelectorComponent implements OnInit, OnDestroy {
   }
 
   getBadgeClassRoute(route: Route): string | string[] | Set<string> | { [klass: string]: any } {
-    if (route && !route.status) {
-      route.status = 'UP';
-    }
     return this.getBadgeClass(route.status);
   }
 
   private getBadgeClass(statusState: InstanceStatus): string | string[] | Set<string> | { [klass: string]: any } {
-    if (statusState && (statusState === 'UP' || statusState.toLowerCase() === 'starting')) {
+    if (statusState === 'UP' || statusState.toLowerCase() === 'starting') {
       return 'badge-success';
     } else {
       return 'badge-danger';
@@ -113,9 +110,9 @@ export class RouteSelectorComponent implements OnInit, OnDestroy {
   }
 
   state(route: Route): string | string[] | Set<string> | { [klass: string]: any } {
-    if (route && route.status && route.status === 'DOWN') {
+    if (route.status === 'DOWN') {
       return 'disabled';
-    } else if (route && route.serviceId === this.activeRoute!.serviceId) {
+    } else if (route.serviceId === this.activeRoute!.serviceId) {
       return 'active';
     }
     return '';
@@ -125,9 +122,7 @@ export class RouteSelectorComponent implements OnInit, OnDestroy {
     if (this.searchedInstance === '') {
       this.routes = this.savedRoutes;
     } else {
-      this.routes = this.savedRoutes!.filter(route => {
-        return route.appName.includes(this.searchedInstance);
-      });
+      this.routes = this.savedRoutes!.filter(route => route.appName.includes(this.searchedInstance));
     }
   }
 
@@ -138,8 +133,6 @@ export class RouteSelectorComponent implements OnInit, OnDestroy {
    * @param dropdown
    */
   closeDropDown(dropdown: NgbDropdown): void {
-    if (dropdown) {
-      dropdown.close();
-    }
+    dropdown.close();
   }
 }

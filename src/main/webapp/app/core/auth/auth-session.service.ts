@@ -22,8 +22,9 @@ export class AuthSessionServerProvider {
     const data =
       `username=${encodeURIComponent(credentials.username)}` +
       `&password=${encodeURIComponent(credentials.password)}` +
-      `&remember-me=${credentials.rememberMe}` +
+      `&remember-me=${credentials.rememberMe ? 'true' : 'false'}` +
       '&submit=Login';
+
     const headers = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
 
     return this.http.post<JWTToken>(SERVER_API_URL + 'api/authentication', data, { headers });
@@ -34,10 +35,7 @@ export class AuthSessionServerProvider {
     return this.http.post(SERVER_API_URL + 'api/logout', {}, { observe: 'response' }).pipe(
       map((response: HttpResponse<any>) => {
         // to get a new csrf token call the api
-        this.http.get(SERVER_API_URL + 'api/account').subscribe(
-          () => {},
-          () => {}
-        );
+        this.http.get(SERVER_API_URL + 'api/account').subscribe();
         return response;
       })
     );

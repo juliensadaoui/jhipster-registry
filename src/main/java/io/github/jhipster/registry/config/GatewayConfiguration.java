@@ -1,12 +1,11 @@
 package io.github.jhipster.registry.config;
 
-import io.github.jhipster.config.JHipsterProperties;
-
 import io.github.jhipster.registry.gateway.accesscontrol.AccessControlFilter;
 import io.github.jhipster.registry.gateway.responserewriting.SwaggerBasePathRewritingFilter;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tech.jhipster.config.JHipsterProperties;
 
 @Configuration
 public class GatewayConfiguration {
@@ -28,5 +27,4 @@ public class GatewayConfiguration {
             return new AccessControlFilter(routeLocator, jHipsterProperties);
         }
     }
-
 }

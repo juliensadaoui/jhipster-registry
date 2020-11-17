@@ -24,7 +24,7 @@
     "testFrameworks": [],
     "jhiPrefix": "jhi",
     "skipClient": false,
-    "skipUserManagement": false,
+    "skipUserManagement": true,
     "clientPackageManager": "npm",
     "clientFramework": "angularX",
     "cacheProvider": "no",
@@ -46,6 +46,15 @@
     "gaeScalingType": "automatic",
     "gaeMinInstances": "1",
     "gaeMaxInstances": "2",
-    "gaeCloudSQLInstanceNeeded": "Y"
+    "gaeCloudSQLInstanceNeeded": "Y",
+    "skipServer": false,
+    "skipCheckLengthOfIdentifier": false,
+    "skipFakeData": false,
+    "pages": [],
+    "clientThemeVariant": "",
+    "withAdminUi": true,
+    "nativeLanguage": "en",
+    "languages": ["en", "fr"],
+    "reactive": false
   }
 }

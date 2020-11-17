@@ -122,12 +122,12 @@
                 <div class="card-block">
                     <table id="healthCheck" class="table">
                         <tbody>
-                        <tr *ngFor="let componentHealth of health.components | keys">
+                        <tr *ngFor="let componentHealth of health.components | keyvalue">
                             <td><span class="text-capitalize">{{ componentHealth.key }}</span></td>
                             <td class="text-center">
                             <td class="text-center">
-                                <span class="badge" [ngClass]="getBadgeClass(componentHealth.value.status)">
-                                    {{ componentHealth.value.status }}
+                                <span class="badge" [ngClass]="getBadgeClass(componentHealth.value!.status)">
+                                    {{ componentHealth.value!.status }}
                                 </span>
                             </td>
                         </tr>

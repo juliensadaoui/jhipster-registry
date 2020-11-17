@@ -11,8 +11,8 @@ export class StateStorageService {
     this.$sessionStorage.store(this.previousUrlKey, url);
   }
 
-  getUrl(): string | null | undefined {
-    return this.$sessionStorage.retrieve(this.previousUrlKey);
+  getUrl(): string | null {
+    return this.$sessionStorage.retrieve(this.previousUrlKey) as string | null;
   }
 
   clearUrl(): void {
@@ -23,12 +23,12 @@ export class StateStorageService {
     const destinationInfo = {
       destination: {
         name: destinationState.name,
-        data: destinationState.data
+        data: destinationState.data,
       },
       params: destinationStateParams,
       from: {
-        name: fromState.name
-      }
+        name: fromState.name,
+      },
     };
     this.$sessionStorage.store('destinationState', destinationInfo);
   }

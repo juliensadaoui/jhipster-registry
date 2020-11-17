@@ -24,7 +24,7 @@ export class RefreshService {
   }
 
   getSelectedRefreshTime(): number {
-    return this.sessionStorage.retrieve('refreshTime');
+    return this.sessionStorage.retrieve('refreshTime') as number;
   }
 
   storeSelectedRefreshTime(time: number): void {

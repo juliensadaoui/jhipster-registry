@@ -44,7 +44,7 @@ export class RoutesService {
   }
 
   getSelectedInstance(): Route {
-    return this.sessionStorage.retrieve('instanceId');
+    return this.sessionStorage.retrieve('instanceId') as Route;
   }
 
   storeSelectedInstance(instance: Route | undefined): void {

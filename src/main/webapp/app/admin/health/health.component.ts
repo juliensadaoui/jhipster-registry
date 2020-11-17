@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { Health, HealthDetails, HealthKey, HealthStatus, HealthService } from './health.service';
-import { HealthModalComponent } from './health-modal.component';
 import { Route } from 'app/shared/routes/route.model';
 import { RoutesService } from 'app/shared/routes/routes.service';
-import { takeUntil } from 'rxjs/operators';
+import { HealthService } from './health.service';
+import { Health, HealthDetails, HealthStatus } from './health.model';
+import { HealthModalComponent } from './health-modal.component';
 
 @Component({
   selector: 'jhi-health',
@@ -27,7 +28,7 @@ export class HealthComponent implements OnInit, OnDestroy {
   }
 
   refreshActiveRouteHealth(): void {
-    if (this.activeRoute && this.activeRoute.status !== 'DOWN') {
+    if (this.activeRoute?.status !== 'DOWN') {
       this.healthService
         .checkInstanceHealth(this.activeRoute)
         .pipe(takeUntil(this.unsubscribe$))
@@ -56,7 +57,7 @@ export class HealthComponent implements OnInit, OnDestroy {
   }
 
   // user click
-  showHealth(health: { key: HealthKey; value: HealthDetails }): void {
+  showHealth(health: { key: string; value: HealthDetails }): void {
     const modalRef = this.modalService.open(HealthModalComponent);
     modalRef.componentInstance.health = health;
     modalRef.result.then(

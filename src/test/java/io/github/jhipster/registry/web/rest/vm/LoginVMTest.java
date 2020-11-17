@@ -1,14 +1,13 @@
 package io.github.jhipster.registry.web.rest.vm;
 
-import io.github.jhipster.registry.utils.TestUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.jhipster.registry.utils.TestUtils;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class LoginVMTest {
 
@@ -76,11 +75,10 @@ public class LoginVMTest {
         assertThat(validator.validate(vm)).isEmpty();
     }
 
-
     @Test
     public void isRememberMeTest() {
         LoginVM vm = new LoginVM();
-        assertThat(vm.isRememberMe()).isNull();
+        assertThat(vm.isRememberMe()).isFalse();
 
         vm.setRememberMe(true);
         assertThat(vm.isRememberMe()).isTrue();
@@ -89,9 +87,9 @@ public class LoginVMTest {
     @Test
     public void setRememberMeTest() {
         LoginVM vm = new LoginVM();
-        assertThat(vm.isRememberMe()).isNull();
-        vm.setRememberMe(null);
-        assertThat(vm.isRememberMe()).isNull();
+        assertThat(vm.isRememberMe()).isFalse();
+        vm.setRememberMe(false);
+        assertThat(vm.isRememberMe()).isFalse();
         vm.setRememberMe(true);
         assertThat(vm.isRememberMe()).isTrue();
     }
@@ -111,5 +109,4 @@ public class LoginVMTest {
         json = vm.toString().replace(LoginVM.class.getSimpleName(), "");
         assertThat(TestUtils.isValid(json)).isTrue();
     }
-
 }

@@ -1,16 +1,20 @@
-import './polyfills';
+import './core/config/dayjs';
+import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ProdConfig } from './blocks/config/prod.config';
-import { JHipsterRegistryAppModule } from './app.module';
+import { DEBUG_INFO_ENABLED } from 'app/app.constants';
+import { AppModule } from './app.module';
 
-ProdConfig();
+// disable debug data on prod profile to improve performance
+if (!DEBUG_INFO_ENABLED) {
+  enableProdMode();
+}
 
-if (module['hot']) {
-  module['hot'].accept();
+if ((module as any).hot) {
+  (module as any).hot.accept();
 }
 
 platformBrowserDynamic()
-  .bootstrapModule(JHipsterRegistryAppModule, { preserveWhitespaces: true })
+  .bootstrapModule(AppModule, { preserveWhitespaces: true })
   // eslint-disable-next-line no-console
   .then(() => console.log('Application started'))
   .catch(err => console.error(err));
